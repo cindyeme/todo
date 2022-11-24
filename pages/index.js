@@ -1,8 +1,9 @@
 import Head from "next/head";
 import { AddTodoForm } from "../components/AddTodoForm";
+import { xata } from "../src/xataClient";
 import styles from "../styles/Home.module.css";
 
-export default function Home() {
+export default function Home({ todos }) {
   return (
     <div className={styles.container}>
       <Head>
@@ -15,12 +16,47 @@ export default function Home() {
         <div className={styles.content}>
           <h1 className={styles.title}>My Task Manager</h1>
           <ul className={styles.list}>
-            <li className={styles.listItem}>
-              <label className={styles.label}>
-                <input type="checkbox" />
-                <span className={styles.labelText}>Buy oat milk</span>
-              </label>
-            </li>
+            {todos.map((todo) => (
+              <li className={styles.listItem} key={todo.id}>
+                <label className={styles.label}>
+                  <input
+                    type="checkbox"
+                    defaultChecked={todo.is_done}
+                    onClick={() => {
+                      fetch("/api/toggle-todo", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          id: todo.id,
+                          is_done: !todo.is_done,
+                        }),
+                      }).then(() => {
+                        window.location.reload();
+                      });
+                    }}
+                  />
+                  <span className={styles.labelText}>{todo.label}</span>
+                  <button
+                    className={styles.delete}
+                    onClick={() => {
+                      fetch("/api/delete-todo", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: todo.id }),
+                      }).then(() => {
+                        window.location.reload();
+                      });
+                    }}
+                  >
+                    Delete
+                  </button>
+                </label>
+              </li>
+            ))}
           </ul>
           <AddTodoForm />
         </div>
@@ -28,3 +64,8 @@ export default function Home() {
     </div>
   );
 }
+
+export const getServerSideProps = async () => {
+  const todos = await xata.db.items.getMany();
+  return { props: { todos } };
+};

@@ -2,21 +2,20 @@ import { useState } from "react";
 import styles from "../styles/Home.module.css";
 
 export const AddTodoForm = () => {
-  const [todo, setTodo] = useState("");
+  const [label, setLabel] = useState("");
 
   const submit = () => {
-    if (todo !== "") { // check that todo is not empty
+    if (label !== "") { // check that label is not empty
       fetch("/api/add-todo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          todo,
+          label,
         }),
       }).then(() => window.location.reload());
     }
-    console.log("todo>>",todo)
   };
 
   return (
@@ -24,7 +23,7 @@ export const AddTodoForm = () => {
       onSubmit={(e) => {
         e.preventDefault();
         submit();
-        setTodo('');
+        setLabel('');
       }}
       className={styles.label}
       style={{padding: '0 0 0 40px', margin: '40px 0 0'}}
@@ -32,10 +31,10 @@ export const AddTodoForm = () => {
       <label>
         <input
           type="text"
-          value={todo}
-          onChange={(e) => setTodo(e.target.value)}
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
           placeholder="Write some code?"
-          style={{height: 35, padding: '0 10px', width: 260}}
+          className={styles.input}
         />
       </label>
       <button className={styles.btn}>Save</button>
