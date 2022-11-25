@@ -85,6 +85,8 @@ export const getServerSideProps = async ({req, res}) => {
     res.writeHead(401, {
       "WWW-Authenticate": "Basic realm='This is a private to-do list'",
     });
-    return { redirect: { destination: "/", permanent: false } };
+
+    res.end();
+    return {};
   }
 };

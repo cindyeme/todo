@@ -11,6 +11,7 @@ const handler = async (req, res) => {
   const xata = getXataClient();
   const user = await xata.db.users.filter({ username }).getFirst();
   await xata.db.items.create({ label, is_done, user: { id: user.id } });
+  res.end();
 };
 
 export default handler;
