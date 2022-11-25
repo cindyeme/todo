@@ -2,7 +2,23 @@
 import { buildClient } from "@xata.io/client";
 /** @typedef { import('./types').SchemaTables } SchemaTables */
 /** @type { SchemaTables } */
-const tables = [];
+const tables = [
+  {
+    name: "items",
+    columns: [
+      { name: "label", type: "string" },
+      { name: "is_done", type: "bool", defaultValue: "false" },
+      { name: "user", type: "link", link: { table: "users" } },
+    ],
+  },
+  {
+    name: "users",
+    columns: [
+      { name: "user", type: "string", defaultValue: "undefined" },
+      { name: "password", type: "string", defaultValue: "undefined" },
+    ],
+  },
+];
 /** @type { import('../../client/src').ClientConstructor<{}> } */
 const DatabaseClient = buildClient();
 const defaultOptions = {

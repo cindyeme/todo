@@ -1,6 +1,8 @@
 import Head from "next/head";
 import { AddTodoForm } from "../components/AddTodoForm";
-import { xata } from "../src/xataClient";
+import { authorize } from "../src/authorize";
+import { getXataClient } from "../src/xata";
+// import { xata } from "../src/xataClient";
 import styles from "../styles/Home.module.css";
 
 export default function Home({ todos }) {
@@ -65,7 +67,24 @@ export default function Home({ todos }) {
   );
 }
 
-export const getServerSideProps = async () => {
-  const todos = await xata.db.items.getMany();
-  return { props: { todos } };
+export const getServerSideProps = async ({req, res}) => {
+  const { isAuthenticated, username } = await authorize(req);
+
+  if (isAuthenticated) {
+    const xata = getXataClient();
+    const todos = await xata.db.items
+      .filter("user.username", username) // to-do items are now filtered to the current authenticated user
+      .getMany();
+
+    return {
+      props: {
+        todos,
+      },
+    };
+  } else {
+    res.writeHead(401, {
+      "WWW-Authenticate": "Basic realm='This is a private to-do list'",
+    });
+    return { redirect: { destination: "/", permanent: false } };
+  }
 };
